@@ -1,0 +1,183 @@
+// Satnam Singh Chana - E-Commerce Schema
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  name         String
+  passwordHash String
+  role         String   @default("ADMIN") // ADMIN | CUSTOMER
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Category {
+  id          String    @id @default(cuid())
+  name        String    @unique
+  slug        String    @unique
+  description String?
+  image       String?
+  color       String?   // background color for card
+  icon        String?   // emoji or icon name
+  order       Int       @default(0)
+  products    Product[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model Product {
+  id              String   @id @default(cuid())
+  name            String
+  slug            String   @unique
+  shortDescription String?
+  description     String
+  categoryId      String
+  category        Category @relation(fields: [categoryId], references: [id])
+  // comma-separated list of image URLs (JSON string)
+  images          String   @default("[]")
+  // base price
+  price           Float
+  // sale price (optional)
+  salePrice       Float?
+  // weight variants as JSON: [{"label":"360 G","value":"360g","price":195}, ...]
+  variants        String   @default("[]")
+  // default display weight
+  weight          String?
+  inStock         Boolean  @default(true)
+  stockQuantity   Int      @default(50)
+  isFeatured      Boolean  @default(false)
+  isDealOfDay     Boolean  @default(false)
+  isBestseller    Boolean  @default(false)
+  isNew           Boolean  @default(false)
+  rating          Float    @default(4.5)
+  reviewCount     Int      @default(0)
+  tags            String   @default("") // comma separated
+  ingredients     String?
+  nutritionalInfo String?  // JSON string
+  benefits        String?  // JSON array string
+  shelfLife       String?
+  storageInfo     String?
+  soldCount       Int      @default(0)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  reviews         Review[]
+  orderItems      OrderItem[]
+
+  @@index([categoryId])
+  @@index([slug])
+}
+
+model Order {
+  id               String      @id @default(cuid())
+  orderNumber      String      @unique
+  // customer info
+  customerName     String
+  email            String
+  phone            String
+  // shipping address
+  address          String
+  city             String
+  state            String
+  pincode          String
+  // notes
+  notes            String?
+  // pricing
+  subtotal         Float
+  discount         Float       @default(0)
+  shipping         Float       @default(0)
+  total            Float
+  couponCode       String?
+  // payment
+  paymentMethod    String      @default("RAZORPAY") // RAZORPAY | COD
+  paymentStatus    String      @default("PENDING") // PENDING | PAID | FAILED | REFUNDED
+  razorpayOrderId  String?
+  razorpayPaymentId String?
+  razorpaySignature String?
+  // order status
+  status           String      @default("PENDING") // PENDING | CONFIRMED | PROCESSING | SHIPPED | DELIVERED | CANCELLED
+  items            OrderItem[]
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime    @updatedAt
+
+  @@index([email])
+  @@index([status])
+  @@index([orderNumber])
+}
+
+model OrderItem {
+  id        String  @id @default(cuid())
+  orderId   String
+  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId String?
+  product   Product? @relation(fields: [productId], references: [id])
+  name      String
+  image     String?
+  price     Float
+  quantity  Int
+  weight    String?
+  variant   String?
+  total     Float
+}
+
+model Review {
+  id          String   @id @default(cuid())
+  productId   String
+  product     Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  customerName String
+  email       String
+  rating      Int      // 1-5
+  title       String?
+  comment     String
+  verified    Boolean  @default(false)
+  approved    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+
+  @@index([productId])
+  @@index([approved])
+}
+
+model Coupon {
+  id          String    @id @default(cuid())
+  code        String    @unique
+  description String?
+  type        String    @default("PERCENTAGE") // PERCENTAGE | FLAT
+  value       Float
+  minOrder    Float     @default(0)
+  maxDiscount Float?
+  isActive    Boolean   @default(true)
+  usageLimit  Int       @default(100)
+  usageCount  Int       @default(0)
+  expiresAt   DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model Setting {
+  id    String @id @default(cuid())
+  key   String @unique
+  value String
+}
+
+model NewsletterSubscriber {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  createdAt DateTime @default(now())
+}
+
+model ContactMessage {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  phone     String?
+  subject   String
+  message   String
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
