@@ -4,7 +4,7 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "mysql"
   url      = env("DATABASE_URL")
 }
 
@@ -36,14 +36,14 @@ model Product {
   id              String   @id @default(cuid())
   name            String
   slug            String   @unique
-  shortDescription String?
-  description     String
+  shortDescription String?  @db.Text
+  description     String    @db.Text
   categoryId      String
   category        Category  @relation(fields: [categoryId], references: [id])
-  images          String
+  images          String    @db.Text
   price           Float
   salePrice       Float?
-  variants        String
+  variants        String    @db.Text
   weight          String?
   inStock         Boolean   @default(true)
   stockQuantity   Int       @default(50)
@@ -53,10 +53,10 @@ model Product {
   isNew           Boolean   @default(false)
   rating          Float     @default(4.5)
   reviewCount     Int       @default(0)
-  tags            String
-  ingredients     String?
-  nutritionalInfo String?
-  benefits        String?
+  tags            String    @db.Text
+  ingredients     String?   @db.Text
+  nutritionalInfo String?   @db.Text
+  benefits        String?   @db.Text
   shelfLife       String?
   storageInfo     String?
   soldCount       Int      @default(0)
@@ -82,7 +82,7 @@ model Order {
   state            String
   pincode          String
   // notes
-  notes            String?
+  notes            String?     @db.Text
   // pricing
   subtotal         Float
   discount         Float       @default(0)
@@ -129,7 +129,7 @@ model Review {
   email       String
   rating      Int      // 1-5
   title       String?
-  comment     String
+  comment     String   @db.Text
   verified    Boolean  @default(false)
   approved    Boolean  @default(true)
   createdAt   DateTime @default(now())
@@ -157,7 +157,7 @@ model Coupon {
 model Setting {
   id    String @id @default(cuid())
   key   String @unique
-  value String
+  value String @db.Text
 }
 
 model NewsletterSubscriber {
@@ -172,7 +172,7 @@ model ContactMessage {
   email     String
   phone     String?
   subject   String
-  message   String
+  message   String   @db.Text
   isRead    Boolean  @default(false)
   createdAt DateTime @default(now())
 }
