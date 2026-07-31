@@ -4,7 +4,7 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -39,29 +39,24 @@ model Product {
   shortDescription String?
   description     String
   categoryId      String
-  category        Category @relation(fields: [categoryId], references: [id])
-  // comma-separated list of image URLs (JSON string)
-  images          String   @default("[]")
-  // base price
+  category        Category  @relation(fields: [categoryId], references: [id])
+  images          String
   price           Float
-  // sale price (optional)
   salePrice       Float?
-  // weight variants as JSON: [{"label":"360 G","value":"360g","price":195}, ...]
-  variants        String   @default("[]")
-  // default display weight
+  variants        String
   weight          String?
-  inStock         Boolean  @default(true)
-  stockQuantity   Int      @default(50)
-  isFeatured      Boolean  @default(false)
-  isDealOfDay     Boolean  @default(false)
-  isBestseller    Boolean  @default(false)
-  isNew           Boolean  @default(false)
-  rating          Float    @default(4.5)
-  reviewCount     Int      @default(0)
-  tags            String   @default("") // comma separated
+  inStock         Boolean   @default(true)
+  stockQuantity   Int       @default(50)
+  isFeatured      Boolean   @default(false)
+  isDealOfDay     Boolean   @default(false)
+  isBestseller    Boolean   @default(false)
+  isNew           Boolean   @default(false)
+  rating          Float     @default(4.5)
+  reviewCount     Int       @default(0)
+  tags            String
   ingredients     String?
-  nutritionalInfo String?  // JSON string
-  benefits        String?  // JSON array string
+  nutritionalInfo String?
+  benefits        String?
   shelfLife       String?
   storageInfo     String?
   soldCount       Int      @default(0)

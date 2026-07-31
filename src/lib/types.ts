@@ -156,6 +156,8 @@ export interface Settings {
   gmailAppPassword: string;
   storeNotifyEmail: string;
   emailEnabled: boolean;
+  storeLogoUrl: string;
+  heroPosters: string;
 }
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -180,6 +182,8 @@ export const DEFAULT_SETTINGS: Settings = {
   gmailAppPassword: "",
   storeNotifyEmail: "",
   emailEnabled: true,
+  storeLogoUrl: "",
+  heroPosters: "/banners/hero1.jpg\n/banners/hero2.jpg",
 };
 
 // Sentinel value returned by the API for secret fields that are set but masked

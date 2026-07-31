@@ -35,8 +35,12 @@ export function ProductCard({ product, className, compact = false }: ProductCard
   const wishlist = useWishlist();
   const isWished = wishlist.has(product.id);
 
-  const discount = discountPercent(product.price, product.salePrice);
-  const price = effectivePrice(product.price, product.salePrice);
+  const variants = Array.isArray(product.variants) ? product.variants : [];
+  const [selectedVariant, setSelectedVariant] = useState<any>(variants[0] || null);
+
+  const discount = selectedVariant ? 0 : discountPercent(product.price, product.salePrice);
+  const price = selectedVariant ? selectedVariant.price : effectivePrice(product.price, product.salePrice);
+  const originalPrice = selectedVariant ? selectedVariant.price : product.price;
   const images = product.images?.length ? product.images : ["/products/roasted-chana-plain.png"];
 
   const handleAddToCart = async (e: React.MouseEvent) => {
@@ -46,16 +50,16 @@ export function ProductCard({ product, className, compact = false }: ProductCard
       return;
     }
     setAdding(true);
-    const variant = product.variants?.[0];
+    const variant = selectedVariant;
     addItem({
       productId: product.id,
       slug: product.slug,
       name: product.name,
       image: images[0],
-      price: product.price,
-      salePrice: product.salePrice,
+      price: variant ? variant.price : product.price,
+      salePrice: variant ? null : product.salePrice,
       quantity: 1,
-      weight: product.weight || variant?.label,
+      weight: variant ? variant.label : product.weight,
       variant: variant?.value,
       maxStock: product.stockQuantity,
     });
@@ -175,12 +179,30 @@ export function ProductCard({ product, className, compact = false }: ProductCard
           </p>
         )}
 
-        {/* Weight */}
-        {product.weight && (
+        {/* Variants or Weight */}
+        {variants.length > 0 ? (
+          <div className="flex flex-wrap gap-1.5 mt-0.5 mb-1" onClick={(e) => e.stopPropagation()}>
+            {variants.map((v: any, i: number) => (
+              <button
+                key={i}
+                type="button"
+                onClick={() => setSelectedVariant(v)}
+                className={cn(
+                  "rounded-md border px-1.5 py-0.5 text-[10px] font-medium transition-colors",
+                  selectedVariant?.label === v.label
+                    ? "border-primary bg-primary/10 text-primary"
+                    : "border-border bg-background text-muted-foreground hover:border-primary/50"
+                )}
+              >
+                {v.label}
+              </button>
+            ))}
+          </div>
+        ) : product.weight ? (
           <span className="text-[11px] font-medium text-muted-foreground">
             {product.weight}
           </span>
-        )}
+        ) : null}
 
         {/* Rating */}
         <div className="flex items-center justify-between">
@@ -207,13 +229,13 @@ export function ProductCard({ product, className, compact = false }: ProductCard
               </span>
               {discount > 0 && (
                 <span className="text-xs text-muted-foreground line-through">
-                  {formatINR(product.price)}
+                  {formatINR(originalPrice)}
                 </span>
               )}
             </div>
             {discount > 0 && (
               <span className="text-[10px] font-semibold text-destructive">
-                Save {formatINR(product.price - price)}
+                Save {formatINR(originalPrice - price)}
               </span>
             )}
           </div>

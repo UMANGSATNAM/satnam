@@ -117,9 +117,15 @@ export function Header({ categories, settings }: HeaderProps) {
             className="flex shrink-0 items-center gap-2"
             aria-label="Home"
           >
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-brand-gradient text-lg shadow-sm">
-              🫘
-            </div>
+            {settings.storeLogoUrl ? (
+              <div className="relative h-10 w-10 overflow-hidden rounded-full shadow-sm">
+                <Image src={settings.storeLogoUrl} alt={settings.brandName} fill className="object-cover" />
+              </div>
+            ) : (
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-brand-gradient text-lg shadow-sm">
+                🫘
+              </div>
+            )}
             <div className="hidden flex-col leading-none sm:flex">
               <span className="font-playfair text-base font-bold text-foreground">
                 {settings.brandName.split(" ")[0]} {settings.brandName.split(" ")[1] || ""}
@@ -191,9 +197,15 @@ export function Header({ categories, settings }: HeaderProps) {
               <SheetContent side="left" className="w-[300px] sm:w-[340px]">
                 <SheetHeader>
                   <SheetTitle className="flex items-center gap-2">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-brand-gradient">
-                      🫘
-                    </div>
+                    {settings.storeLogoUrl ? (
+                      <div className="relative h-8 w-8 overflow-hidden rounded-full">
+                        <Image src={settings.storeLogoUrl} alt={settings.brandName} fill className="object-cover" />
+                      </div>
+                    ) : (
+                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-brand-gradient">
+                        🫘
+                      </div>
+                    )}
                     {settings.brandName}
                   </SheetTitle>
                 </SheetHeader>

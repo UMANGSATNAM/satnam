@@ -20,15 +20,28 @@ import { ProductCard } from "@/components/shared/product-card";
 import { StarRating } from "@/components/shared/star-rating";
 import { useRouter } from "@/lib/router";
 import type { Product, Category } from "@/lib/types";
-import { useRef } from "react";
+import { useRef, useState, useEffect } from "react";
 
 interface HomeProps {
   products: Product[];
   categories: Category[];
+  settings?: any; // Using any or importing Settings
 }
 
-export function Home({ products, categories }: HomeProps) {
+export function Home({ products, categories, settings }: HomeProps) {
   const { navigate } = useRouter();
+  
+  const posters = settings?.heroPosters?.split("\n").map((s: string) => s.trim()).filter(Boolean) || ["/brand/hero-banner.png"];
+  const [currentPoster, setCurrentPoster] = useState(0);
+
+  useEffect(() => {
+    if (posters.length > 1) {
+      const t = setInterval(() => {
+        setCurrentPoster(p => (p + 1) % posters.length);
+      }, 5000);
+      return () => clearInterval(t);
+    }
+  }, [posters.length]);
 
   const featuredCategories = categories.slice(0, 5);
   const dealsOfDay = products.filter((p) => p.isDealOfDay).slice(0, 8);
@@ -45,14 +58,14 @@ export function Home({ products, categories }: HomeProps) {
     <div className="flex flex-col">
       {/* Hero */}
       <section className="relative overflow-hidden bg-gradient-to-br from-primary/10 via-amber-50 to-primary/5">
-        <div className="absolute inset-0 opacity-30">
+        <div className="absolute inset-0 opacity-30 transition-opacity duration-500">
           <Image
-            src="/brand/hero-banner.png"
+            src={posters[currentPoster]}
             alt=""
             fill
             priority
             sizes="100vw"
-            className="object-cover"
+            className="object-cover transition-all duration-1000"
           />
           <div className="absolute inset-0 bg-gradient-to-r from-background via-background/80 to-transparent" />
         </div>

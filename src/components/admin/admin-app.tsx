@@ -542,6 +542,9 @@ function ProductForm({ product, onClose, onSaved }: { product: Product | null; o
     storageInfo: product?.storageInfo || "",
     images: product?.images?.join("\n") || "/products/roasted-chana-plain.png",
   });
+  const [variants, setVariants] = useState<{ label: string; value: string; price: number }[]>(
+    Array.isArray(product?.variants) ? product.variants as any : []
+  );
   const [saving, setSaving] = useState(false);
 
   const save = async () => {
@@ -568,6 +571,7 @@ function ProductForm({ product, onClose, onSaved }: { product: Product | null; o
         shelfLife: form.shelfLife,
         storageInfo: form.storageInfo,
         images: form.images.split("\n").map((i) => i.trim()).filter(Boolean),
+        variants,
       };
       const url = product ? `/api/products/${product.slug}` : "/api/products";
       const method = product ? "PUT" : "POST";
@@ -615,8 +619,37 @@ function ProductForm({ product, onClose, onSaved }: { product: Product | null; o
             <Input type="number" value={form.salePrice} onChange={(e) => setForm({ ...form, salePrice: e.target.value })} />
           </div>
           <div>
-            <Label>Weight</Label>
+            <Label>Default Weight</Label>
             <Input value={form.weight} onChange={(e) => setForm({ ...form, weight: e.target.value })} placeholder="e.g. 360G" />
+          </div>
+          <div className="sm:col-span-2 rounded-lg border border-border bg-card p-3">
+            <div className="flex items-center justify-between pb-2">
+              <Label className="text-sm font-semibold">Weight Variants (Optional)</Label>
+              <Button type="button" variant="outline" size="sm" onClick={() => setVariants([...variants, { label: "", value: "", price: 0 }])}>
+                <Plus size={14} className="mr-1" /> Add Variant
+              </Button>
+            </div>
+            {variants.length > 0 && (
+              <div className="grid gap-2">
+                {variants.map((v, i) => (
+                  <div key={i} className="flex gap-2 items-start">
+                    <div className="flex-1">
+                      <Input placeholder="Label (e.g. 250G)" value={v.label} onChange={(e) => { const newV = [...variants]; newV[i].label = e.target.value; setVariants(newV); }} className="text-xs h-8" />
+                    </div>
+                    <div className="flex-1">
+                      <Input placeholder="Value (e.g. 250g)" value={v.value} onChange={(e) => { const newV = [...variants]; newV[i].value = e.target.value; setVariants(newV); }} className="text-xs h-8" />
+                    </div>
+                    <div className="flex-1">
+                      <Input type="number" placeholder="Price (₹)" value={v.price} onChange={(e) => { const newV = [...variants]; newV[i].price = Number(e.target.value); setVariants(newV); }} className="text-xs h-8" />
+                    </div>
+                    <Button type="button" variant="ghost" size="icon" className="h-8 w-8 text-destructive shrink-0" onClick={() => { const newV = [...variants]; newV.splice(i, 1); setVariants(newV); }}>
+                      <Trash2 size={14} />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            )}
+            <p className="mt-1 text-[10px] text-muted-foreground">If you add variants, users can select these weights on the product card.</p>
           </div>
           <div>
             <Label>Stock Quantity</Label>
@@ -1161,7 +1194,11 @@ function SettingsView({ initialSettings }: { initialSettings: Settings }) {
           <div><Label>Email (display)</Label><Input value={settings.email} onChange={(e) => setSettings({ ...settings, email: e.target.value })} /></div>
           <div><Label>Phone</Label><Input value={settings.phone} onChange={(e) => setSettings({ ...settings, phone: e.target.value })} /></div>
           <div><Label>Address</Label><Textarea value={settings.address} onChange={(e) => setSettings({ ...settings, address: e.target.value })} rows={2} /></div>
-          <div><Label>Announcement Bar Text</Label><Input value={settings.announcementBar} onChange={(e) => setSettings({ ...settings, announcementBar: e.target.value })} /></div>
+          <div className="grid gap-3 sm:grid-cols-2">
+            <div><Label>Store Logo URL (ImageKit etc.)</Label><Input value={settings.storeLogoUrl || ""} onChange={(e) => setSettings({ ...settings, storeLogoUrl: e.target.value })} placeholder="https://..." /></div>
+            <div><Label>Announcement Bar Text (Offers)</Label><Input value={settings.announcementBar} onChange={(e) => setSettings({ ...settings, announcementBar: e.target.value })} /></div>
+          </div>
+          <div><Label>Hero Posters (One URL per line)</Label><Textarea value={settings.heroPosters || ""} onChange={(e) => setSettings({ ...settings, heroPosters: e.target.value })} rows={3} placeholder="https://...\nhttps://..." /></div>
         </CardContent>
       </Card>
 

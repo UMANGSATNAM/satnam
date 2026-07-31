@@ -39,7 +39,7 @@ export function AppShell({ products, categories, settings }: AppShellProps) {
   let showHeaderFooter = true;
 
   if (segments.length === 0 || path === "/") {
-    content = <Home products={products} categories={categories} />;
+    content = <Home products={products} categories={categories} settings={settings} />;
   } else if (segments[0] === "products") {
     content = <ProductsList key={`products-${route.query.get("search") || ""}`} initialSearch={route.query.get("search") || undefined} />;
   } else if (segments[0] === "category" && segments[1]) {

@@ -43,6 +43,8 @@ export async function getSettings(): Promise<Settings> {
     gmailAppPassword: map.gmailAppPassword || process.env.GMAIL_APP_PASSWORD || "",
     storeNotifyEmail: map.storeNotifyEmail || process.env.STORE_NOTIFY_EMAIL || "",
     emailEnabled: bool("emailEnabled", DEFAULT_SETTINGS.emailEnabled),
+    storeLogoUrl: map.storeLogoUrl || DEFAULT_SETTINGS.storeLogoUrl,
+    heroPosters: map.heroPosters || DEFAULT_SETTINGS.heroPosters,
   };
 }
 
